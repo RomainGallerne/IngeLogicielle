@@ -7,16 +7,12 @@ public class OrderedDictionary extends AbstractDictionary {
     }
 
     @Override
-    public IDictionary put(Object key, Object value) {
-        Object[] NouvCles = new Object[this.cles.length+1];
-        Object[] NouvValeurs = new Object[this.valeurs.length+1];
-    }
-
-    @Override
     protected int indexOf(Object key) {
-        for (int i=0;i<this.cles.length; i++){
-            if (cles[i].equals(key)){
-                return i;
+        if(containsKey(key)) {
+            for (int i = 0; i < size(); i++) {
+                if (cles[i].equals(key)) {
+                    return i;
+                }
             }
         }
         return -1;
@@ -24,6 +20,19 @@ public class OrderedDictionary extends AbstractDictionary {
 
     @Override
     protected int newIndexOf(Object key) {
-        return 0;
+        grow();
+        return size()-1;
+    }
+
+    @Override
+    protected void grow() {
+        Object[] newCles = new Object[size()+1];
+        Object[] newValeurs = new Object[size()+1];
+        for (int i=0;i<size();i++){
+            newCles[i] = cles[i];
+            newValeurs[i] = valeurs[i];
+        }
+        cles = newCles;
+        valeurs = newValeurs;
     }
 }

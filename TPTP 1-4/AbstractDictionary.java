@@ -1,4 +1,5 @@
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 public abstract class AbstractDictionary implements IDictionary {
     protected Object[] cles;
@@ -6,6 +7,7 @@ public abstract class AbstractDictionary implements IDictionary {
 
     protected abstract int indexOf(Object key);
     protected abstract int newIndexOf(Object key);
+    protected abstract void grow();
 
     @Override
     public Object get(Object key) {
@@ -15,8 +17,16 @@ public abstract class AbstractDictionary implements IDictionary {
     }
 
     @Override
-    public IDictionary put(Object key, Object value) {
-        return null;
+    public IDictionary put(Object key, Object value){
+        if(!containsKey(key)){
+            int newindex = newIndexOf(key);
+            cles[newindex] = key;
+            valeurs[newindex] = value;
+        } else {
+            int index = indexOf(key);
+            valeurs[index] = value;
+        }
+        return this;
     }
 
     @Override
@@ -32,11 +42,19 @@ public abstract class AbstractDictionary implements IDictionary {
 
     @Override
     public boolean containsKey(Object key) {
-        for (int i=0;i<this.cles.length; i++){
-            if (cles[i].equals(key)){
+        for (Object k : cles){
+            if (k!=null && k.equals(key)){
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractDictionary{" +
+                "cles=" + Arrays.toString(cles) +
+                ", valeurs=" + Arrays.toString(valeurs) +
+                '}';
     }
 }
