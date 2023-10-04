@@ -6,7 +6,7 @@ public class FastDictionary extends AbstractDictionary{
         this.valeurs = new Object[0];
     }
 
-    @Override
+    /*@Override
     protected int indexOf(Object key) {
         if(containsKey(key)) {
             for (int i = 0; i < size(); i++) {
@@ -16,9 +16,19 @@ public class FastDictionary extends AbstractDictionary{
             }
         }
         return -1;
+    }*/
+    public int indexOf(Object key) {
+        int hash = key.hashCode();
+        if (hash < 0) hash = -1 * hash;
+        int i = hash % cles.length;
+        while ((!(key.equals(cles[i]))) && (cles[i] != null)) {
+            i = (i + 1) % cles.length;
+        }
+        if (cles[i] == null) return -1;
+        else return i;
     }
 
-    @Override
+    /*@Override
     protected int newIndexOf(Object key) {
         boolean grown = false;
         int newindex;
@@ -41,6 +51,22 @@ public class FastDictionary extends AbstractDictionary{
             while(containsKey(newindex)){newindex=(newindex+1)%(cles.length-1);}
         }
         return newindex;
+    }*/
+    public int newIndexOf(Object key) {
+        if (this.mustGrow()) this.grow();
+        int hash = key.hashCode();
+        if (hash < 0) hash = -1 * hash;
+        int i = hash % cles.length;
+        if (cles[i] == null) return i;
+        else {
+            do {
+                if (i + 1 < cles.length)
+                    i++;
+                else
+                    i = 0;
+            } while (cles[i] != null);
+            return i;
+        }
     }
 
     @Override
@@ -54,7 +80,7 @@ public class FastDictionary extends AbstractDictionary{
         return nbElem;
     }
 
-    @Override
+    /*@Override
     protected void grow() {
         Object[] newCles = new Object[cles.length*2+1];
         Object[] newValeurs = new Object[valeurs.length*2+1];
@@ -62,9 +88,30 @@ public class FastDictionary extends AbstractDictionary{
             newCles[i] = cles[i];
             newValeurs[i] = valeurs[i];
         }
-        cles = newCles;
-        valeurs = newValeurs;
+        cles = newCles.clone();
+        valeurs = newValeurs.clone();
+
+        Object[] oldCles = cles.clone();
+        Object[] oldVeleurs = valeurs.clone();
+        cles = new Object[cles.length*2+1];
+        valeurs = new Object[valeurs.length*2+1];
+        for (int i=0;i<oldCles.length;i++) {
+            if(oldCles[i]!=null){this.put(oldCles[i],oldVeleurs[i]);}
+        }
+    }*/
+    public void grow() {
+        Object[] oldKeys = cles;
+        Object[] oldValues = valeurs;
+        cles = new Object[oldKeys.length + 5];
+        valeurs = new Object[oldKeys.length + 5];
+
+        for (int i = 0; i < oldKeys.length; i++) {
+            if (oldKeys[i] != null) {
+                this.put(oldKeys[i], oldValues[i]);
+            }
+        }
     }
+
 
     protected boolean mustGrow() {
         return (size()+1 >= 0.75*cles.length);
